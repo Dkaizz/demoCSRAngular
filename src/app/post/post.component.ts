@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PostServiceService } from '../post-service.service';
+import { Meta, Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-post',
@@ -13,12 +14,19 @@ export class PostComponent {
 
   constructor(
     private route: ActivatedRoute,
-    private postApi: PostServiceService
-  ) {}
-  ngOnInit() {
-    this.route.params.subscribe((params) => {
+    private postApi: PostServiceService,
+    private titleService: Title,
+    private metaService: Meta
+  ) {
+    this.route.params.subscribe(async (params) => {
       this.postId = params['postId'];
-      this.post = this.postApi.getPost(this.postId);
+      this.post = await this.postApi.getPost(this.postId);
+      this.titleService.setTitle(this.post.title);
+      this.metaService.updateTag({
+        name: 'description',
+        content: this.post.body,
+      });
     });
   }
+  ngOnInit() {}
 }
